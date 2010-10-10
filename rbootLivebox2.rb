@@ -6,7 +6,9 @@ abort $0 + " requires JRuby" unless defined?(RUBY_ENGINE) && RUBY_ENGINE == "jru
 
 browser = Celerity::Browser.new
 browser.secure_ssl=false
-browser.goto('https://juandenova.ile-australe.eu:12345/')
+
+url=ask("url:    ")
+browser.goto(url)
 
 login=ask("login:    ")
 password=ask("password: ") { |q| q.echo = "x"}
