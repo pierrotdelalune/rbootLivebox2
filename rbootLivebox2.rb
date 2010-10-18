@@ -19,6 +19,10 @@ require "celerity"
 require "highline/import"
 require "getoptlong"
 require "rdoc/usage"
+#
+require "openssl"
+require "open-uri"
+require "hpricot"
 
 abort $0 + " requires JRuby" unless defined?(RUBY_ENGINE) && RUBY_ENGINE == "jruby"
 
@@ -43,6 +47,16 @@ if ARGV.length != 1
 end
 
 url=ARGV.shift
+
+# Check firmware version
+# Disable certicate verification as the certificate is self signed the certificate hostname does not match real hostname 
+OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+doc = Hpricot(open("https://juandenova.ile-australe.eu:12345/"))
+# It is impossible to take advantage of css selectors in the page. As a result we prefer XPath.
+firmware=doc.search("//div[@id='contener']/table[2]/tr/td[2]/table[1]/tr[3]/td[3]/table/tr/td[3]").inner_html
+print "FirmWare: #{firmware}\n"
+print "Warning: This script has been designed for FAST3XXX_68141C firmware, we continue anyway...\n" unless firmware=="FAST3XXX_68141C"
+
 
 browser = Celerity::Browser.new
 # The SSL certificate is self signed and hostname in certificate does match hostname in url
